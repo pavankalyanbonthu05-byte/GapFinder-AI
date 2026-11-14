@@ -1,4 +1,5 @@
-import { streamText } from "ai";
+import { streamText, tool } from "ai";
+import { z } from "zod";
 import { groqProvider, GROQ_MODEL } from "@/lib/groq";
 import { retrieveRelevantChunks } from "@/lib/rag/retriever";
 import { DocumentChunk } from "@/lib/types";
@@ -9,67 +10,75 @@ export async function POST(req: Request) {
   try {
     const { messages, chunks, activeTopicId, activeTopicName } = await req.json();
 
-    const lastUserMessage = messages[messages.length - 1]?.content || "";
+    const allChunks: DocumentChunk[] = (chunks as DocumentChunk[]) || [];
 
-    // Multi-turn context awareness: combine recent user context with active topic for richer retrieval
-    const recentContext = messages
-      .slice(-3)
-      .map((m: any) => m.content)
-      .join(" ");
+    const systemPrompt = `You are "GapFinder AI", a premier academic tutor and knowledge diagnostic expert.
+Your mission is to evaluate the student's uploaded notes, synthesize the core facts, and generate a polished, highly pedagogical, and friendly explanation.
 
-    const retrievalQuery = `${activeTopicName || ""} ${lastUserMessage} ${recentContext}`;
+ACTIVE TOPIC FOCUS: ${activeTopicName || "All Uploaded Study Materials"}
 
-    // Retrieve the most relevant chunks using fast keyword + cosine matching
-    const relevantChunks = retrieveRelevantChunks(
-      retrievalQuery,
-      chunks as DocumentChunk[],
-      5,
-      activeTopicId
-    );
+CRITICAL RULES FOR POLISHED GENERATION:
+1. NEVER display raw database chunks, JSON structures, or rough text fragments (like "[CHUNK #1]" or raw metadata).
+2. ALWAYS evaluate whether the retrieved data directly answers the student's specific question. If you need more specific details or citations, use the provided "searchStudyNotes" tool to find the exact concept!
+3. FRAME EVERY EXPLANATION USING THIS CLEAN, ELEGANT STRUCTURE:
+   • 💡 **Intuitive Explanation**: Explain the concept in clear, conversational English using an intuitive analogy where helpful.
+   • 🔍 **Key Mechanism / Breakdown**: Bulleted, step-by-step breakdown of how it works.
+   • ⚠️ **Exam Blindspot / Common Trap**: Highlight the exact conceptual trap students make on this topic.
+   • 📖 **Verified Reference**: Cite the exact Document and Section name at the bottom in a clean tag (e.g. *Source: Campbell Biology, Section 9.2*).
 
-    const contextText =
-      relevantChunks.length > 0
-        ? relevantChunks
-            .map(
-              (c, i) => `[REFERENCE #${i + 1}]
-Source: ${c.docTitle}
-Section: ${c.section} (${c.pageOrSlide || "No page reference"})
-Content:
-${c.content}`
-            )
-            .join("\n\n")
-        : "No directly matching chunks found in uploaded materials.";
+4. CONVERSATIONAL MEMORY & ADAPTIVE TEACHING:
+   • Actively remember previous questions and answers in this conversation.
+   • If the student asks for simplification (e.g. "I don't understand", "make it simpler"), adapt by breaking it down into smaller steps.
+   • If the student asks for deeper exam details, increase technical precision while maintaining clarity.
 
-    const systemPrompt = `You are "GapFinder AI", a master academic tutor and diagnostic learning specialist.
-Your mission is to evaluate the student's study materials and teach the concept with crystal-clear pedagogical framing, adapting dynamically to the student's understanding.
-
-CRITICAL INSTRUCTIONS ON EVALUATION & SYNTHESIS:
-1. NEVER just dump raw textbook excerpts. Your role is to READ, EVALUATE, and REFRAME the retrieved facts into a well-crafted, easy-to-understand teaching response.
-2. FORMAT EVERY TOPIC EXPLANATION USING THIS ELEGANT STRUCTURE:
-   • 💡 **Intuitive Core Concept**: Explain the big picture in 2-3 engaging sentences using an intuitive real-world analogy.
-   • 🔍 **Step-by-Step Breakdown**: Walk through the mechanism or concept logically (bullet points).
-   • ⚠️ **Exam Blindspot / Common Pitfall**: Highlight the exact mistake students commonly make on this topic in exams.
-   • 📚 **Verified Citations**: Mention the exact source documents & sections where this is grounded (e.g., [Campbell Biology, Section 9.2]).
-
-3. CONVERSATIONAL MEMORY & ADAPTIVE TEACHING:
-   • Actively review the previous chat history to track what the student has already grasped.
-   • If the student expresses confusion or asks for simplification, recalibrate your tone: break it down simpler with step-by-step analogies.
-   • If the student wants rigorous exam details, provide deep biochemical/conceptual rigor.
-
-4. GROUNDING CONSTRAINT:
-   • Every factual assertion must be verified by the RETRIEVED NOTES CONTEXT below.
-   • If a question cannot be answered from the uploaded notes, explicitly state:
-     "This specific detail is not covered in your uploaded notes. Here is what your syllabus material does cover regarding this topic..."
-
-RETRIEVED NOTES CONTEXT (STUDENT STUDY MATERIAL):
-${contextText}
-`;
+5. GROUNDING INTEGRITY:
+   • Only assert facts verified in the student's uploaded study materials.
+   • If a requested detail cannot be found even after searching, state clearly:
+     "This specific detail is not covered in your uploaded notes. Here is the closest verified topic covered in your syllabus..."`;
 
     const result = streamText({
       model: groqProvider(GROQ_MODEL),
       system: systemPrompt,
       messages,
-      temperature: 0.2, // slightly higher for fluid pedagogical framing while remaining grounded
+      maxSteps: 3, // allows tool calling -> evaluation -> final polished synthesis
+      temperature: 0.2,
+      tools: {
+        searchStudyNotes: tool({
+          description:
+            "Search and evaluate the student's uploaded study material, notes, and textbooks for specific concepts, mechanisms, or exam terms.",
+          parameters: z.object({
+            searchQuery: z
+              .string()
+              .describe("The specific academic term, concept, or mechanism to search for"),
+            topicFilter: z
+              .string()
+              .optional()
+              .describe("Optional topic id to constrain search"),
+          }),
+          execute: async ({ searchQuery, topicFilter }) => {
+            const filterToUse = topicFilter || activeTopicId || undefined;
+            const matches = retrieveRelevantChunks(searchQuery, allChunks, 4, filterToUse);
+
+            if (matches.length === 0) {
+              // Try broader search across all topics if filtered search yielded 0
+              const broader = retrieveRelevantChunks(searchQuery, allChunks, 3);
+              return broader.map((c) => ({
+                documentTitle: c.docTitle,
+                section: c.section,
+                pageOrChapter: c.pageOrSlide || "N/A",
+                passage: c.content,
+              }));
+            }
+
+            return matches.map((c) => ({
+              documentTitle: c.docTitle,
+              section: c.section,
+              pageOrChapter: c.pageOrSlide || "N/A",
+              passage: c.content,
+            }));
+          },
+        }),
+      },
     });
 
     return result.toDataStreamResponse();

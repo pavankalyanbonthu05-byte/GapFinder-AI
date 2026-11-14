@@ -11,6 +11,8 @@ import {
   Bot,
   User,
   ArrowRight,
+  RotateCcw,
+  Search,
 } from "lucide-react";
 import { DocumentChunk } from "@/lib/types";
 
@@ -48,10 +50,14 @@ export const ExplainDrawer: React.FC<ExplainDrawerProps> = ({
   if (!isOpen) return null;
 
   const quickPrompts = [
-    `What are the most common exam mistakes in ${topicName}?`,
-    `Explain this concept step-by-step with citations from my notes.`,
-    `Give me a memory mnemonic for this topic.`,
+    `Explain ${topicName} step-by-step with an intuitive analogy.`,
+    `What are the most common exam traps and misconceptions in ${topicName}?`,
+    `Summarize the key mechanism and give me an exam checklist for ${topicName}.`,
   ];
+
+  const handleResetChat = () => {
+    setMessages([]);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/40 backdrop-blur-xs transition-opacity">
@@ -64,32 +70,44 @@ export const ExplainDrawer: React.FC<ExplainDrawerProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <h3 className="text-sm font-bold text-slate-900">Explain-This-Topic Assistant</h3>
-                <span className="rounded bg-emerald-100 px-1.5 py-0.2 text-[10px] font-bold text-emerald-800">
-                  RAG Only
+                <h3 className="text-sm font-bold text-slate-900">AI Pedagogical Tutor</h3>
+                <span className="rounded bg-indigo-100 px-1.5 py-0.2 text-[10px] font-bold text-indigo-700">
+                  Evaluated RAG
                 </span>
               </div>
               <p className="text-xs text-indigo-700 font-semibold truncate max-w-xs">
-                Topic: {topicName}
+                {topicName || "All Uploaded Study Materials"}
               </p>
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          <div className="flex items-center gap-1.5">
+            {messages.length > 0 && (
+              <button
+                onClick={handleResetChat}
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition"
+                title="Restart Chat"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition"
+              title="Close"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
-        {/* Grounding Notice */}
+        {/* Grounding & Tool Notice */}
         <div className="bg-indigo-50/60 border-b border-indigo-100 px-6 py-2.5 flex items-center justify-between text-[11px] text-indigo-900">
           <span className="flex items-center gap-1.5">
             <ShieldCheck className="h-3.5 w-3.5 text-indigo-600" />
-            Answers strictly from your uploaded notes chunks. Zero hallucination.
+            Evaluated by LLM with dynamic tool calling for grounded accuracy.
           </span>
-          <span className="text-[10px] font-mono text-indigo-500">Groq 120b</span>
+          <span className="text-[10px] font-mono text-indigo-600 font-semibold">Groq 120b</span>
         </div>
 
         {/* Messages List */}
@@ -101,11 +119,11 @@ export const ExplainDrawer: React.FC<ExplainDrawerProps> = ({
               </div>
               <div className="space-y-1">
                 <h4 className="text-sm font-bold text-slate-900">
-                  Ask anything about "{topicName}"
+                  Ask anything about "{topicName || "your course notes"}"
                 </h4>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  The assistant will cross-reference your uploaded notes and provide explanations with
-                  exact section citations.
+                <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
+                  The AI tutor evaluates your uploaded chapters, validates factual citations, and frames
+                  clean, intuitive explanations with analogies and exam tips.
                 </p>
               </div>
 
@@ -145,13 +163,16 @@ export const ExplainDrawer: React.FC<ExplainDrawerProps> = ({
                   )}
 
                   <div
-                    className={`rounded-2xl p-4 max-w-[85%] ${
+                    className={`rounded-2xl p-4 max-w-[88%] ${
                       isAssistant
-                        ? "bg-slate-50 border border-slate-200/80 text-slate-800 space-y-2"
-                        : "bg-indigo-600 text-white"
+                        ? "bg-slate-50 border border-slate-200/80 text-slate-800 space-y-2 shadow-2xs"
+                        : "bg-indigo-600 text-white shadow-xs"
                     }`}
                   >
-                    <div className="whitespace-pre-wrap">{m.content}</div>
+                    {/* Render message with clean paragraph and line breaks */}
+                    <div className="whitespace-pre-wrap leading-relaxed space-y-1.5 font-normal">
+                      {m.content}
+                    </div>
                   </div>
 
                   {!isAssistant && (
@@ -165,9 +186,9 @@ export const ExplainDrawer: React.FC<ExplainDrawerProps> = ({
           )}
 
           {isLoading && (
-            <div className="flex items-center gap-2 text-xs text-slate-500 py-2">
-              <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
-              <span>Retrieving source chunks and streaming answer...</span>
+            <div className="flex items-center gap-2 rounded-xl bg-indigo-50/70 border border-indigo-100 p-3 text-xs text-indigo-700 animate-pulse">
+              <Search className="h-4 w-4 animate-spin text-indigo-600" />
+              <span>Evaluating notes, verifying citations, and synthesizing polished explanation...</span>
             </div>
           )}
           <div ref={messagesEndRef} />
@@ -181,7 +202,7 @@ export const ExplainDrawer: React.FC<ExplainDrawerProps> = ({
           <input
             value={input}
             onChange={handleInputChange}
-            placeholder={`Ask a question grounded in ${topicName}...`}
+            placeholder={`Ask a question or request a simpler explanation...`}
             className="flex-1 rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
           />
           <button
