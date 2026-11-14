@@ -71,11 +71,11 @@ export default function DashboardPage() {
         // ignore
       }
     } else {
-      // Default to demo session for ease of judging
+      // Default to guest session for ease of use
       const defaultUser: UserSession = {
-        email: "demo@gapfinder.ai",
-        name: "Dr. Alex Vance (Hackathon Judge)",
-        role: "judge",
+        email: "guest@gapfinder.ai",
+        name: "Guest Student",
+        role: "guest",
         isDemoUser: true,
       };
       setUser(defaultUser);
@@ -188,6 +188,13 @@ export default function DashboardPage() {
         onOpenHowItWorks={() => setIsHowItWorksOpen(true)}
         onLoadDemoData={handleLoadDemo}
         onLogout={handleLogout}
+        onOpenChatbot={() => {
+          setSelectedTopicForExplain({
+            id: "",
+            name: "Course Materials & General Q&A",
+          });
+          setIsExplainOpen(true);
+        }}
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">

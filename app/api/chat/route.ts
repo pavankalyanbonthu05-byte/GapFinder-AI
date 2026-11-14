@@ -7,15 +7,23 @@ export const maxDuration = 30; // 30s max for Vercel
 
 export async function POST(req: Request) {
   try {
-    const { messages, chunks, activeTopicId } = await req.json();
+    const { messages, chunks, activeTopicId, activeTopicName } = await req.json();
 
     const lastUserMessage = messages[messages.length - 1]?.content || "";
 
+    // Multi-turn context awareness: combine recent user context with active topic for richer retrieval
+    const recentContext = messages
+      .slice(-3)
+      .map((m: any) => m.content)
+      .join(" ");
+
+    const retrievalQuery = `${activeTopicName || ""} ${lastUserMessage} ${recentContext}`;
+
     // Retrieve the most relevant chunks using fast keyword + cosine matching
     const relevantChunks = retrieveRelevantChunks(
-      lastUserMessage,
+      retrievalQuery,
       chunks as DocumentChunk[],
-      4,
+      5,
       activeTopicId
     );
 
@@ -23,7 +31,7 @@ export async function POST(req: Request) {
       relevantChunks.length > 0
         ? relevantChunks
             .map(
-              (c, i) => `[CITATION #${i + 1}]
+              (c, i) => `[REFERENCE #${i + 1}]
 Source: ${c.docTitle}
 Section: ${c.section} (${c.pageOrSlide || "No page reference"})
 Content:
@@ -32,16 +40,28 @@ ${c.content}`
             .join("\n\n")
         : "No directly matching chunks found in uploaded materials.";
 
-    const systemPrompt = `You are "GapFinder Explain", an empathetic, highly pedagogical AI tutor.
-CRITICAL MANDATORY INSTRUCTIONS:
-1. You must answer the student's question STRICTLY based on the provided RETRIEVED NOTES CONTEXT below.
-2. Under no circumstances should you hallucinate or introduce facts from outside the provided context.
-3. If the answer is NOT present in the notes context, politely state:
-   "I cannot find this in your uploaded notes and textbook chapters. Please make sure the relevant chapter is uploaded."
-4. Always provide inline citations, referencing the exact Section and Source (e.g. [Campbell Biology, Section 9.2]).
-5. Keep explanations clear, step-by-step, and focused on overcoming common exam mistakes.
+    const systemPrompt = `You are "GapFinder AI", a master academic tutor and diagnostic learning specialist.
+Your mission is to evaluate the student's study materials and teach the concept with crystal-clear pedagogical framing, adapting dynamically to the student's understanding.
 
-RETRIEVED NOTES CONTEXT:
+CRITICAL INSTRUCTIONS ON EVALUATION & SYNTHESIS:
+1. NEVER just dump raw textbook excerpts. Your role is to READ, EVALUATE, and REFRAME the retrieved facts into a well-crafted, easy-to-understand teaching response.
+2. FORMAT EVERY TOPIC EXPLANATION USING THIS ELEGANT STRUCTURE:
+   • 💡 **Intuitive Core Concept**: Explain the big picture in 2-3 engaging sentences using an intuitive real-world analogy.
+   • 🔍 **Step-by-Step Breakdown**: Walk through the mechanism or concept logically (bullet points).
+   • ⚠️ **Exam Blindspot / Common Pitfall**: Highlight the exact mistake students commonly make on this topic in exams.
+   • 📚 **Verified Citations**: Mention the exact source documents & sections where this is grounded (e.g., [Campbell Biology, Section 9.2]).
+
+3. CONVERSATIONAL MEMORY & ADAPTIVE TEACHING:
+   • Actively review the previous chat history to track what the student has already grasped.
+   • If the student expresses confusion or asks for simplification, recalibrate your tone: break it down simpler with step-by-step analogies.
+   • If the student wants rigorous exam details, provide deep biochemical/conceptual rigor.
+
+4. GROUNDING CONSTRAINT:
+   • Every factual assertion must be verified by the RETRIEVED NOTES CONTEXT below.
+   • If a question cannot be answered from the uploaded notes, explicitly state:
+     "This specific detail is not covered in your uploaded notes. Here is what your syllabus material does cover regarding this topic..."
+
+RETRIEVED NOTES CONTEXT (STUDENT STUDY MATERIAL):
 ${contextText}
 `;
 
@@ -49,7 +69,7 @@ ${contextText}
       model: groqProvider(GROQ_MODEL),
       system: systemPrompt,
       messages,
-      temperature: 0.1,
+      temperature: 0.2, // slightly higher for fluid pedagogical framing while remaining grounded
     });
 
     return result.toDataStreamResponse();

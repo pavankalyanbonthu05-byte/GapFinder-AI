@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Sparkles, Brain, Cpu, HelpCircle, LogOut } from "lucide-react";
+import { Sparkles, Brain, Cpu, HelpCircle, LogOut, MessageSquare, Bot } from "lucide-react";
 import { UserSession } from "@/lib/types";
 
 interface NavbarProps {
@@ -10,6 +10,7 @@ interface NavbarProps {
   onOpenHowItWorks: () => void;
   onLoadDemoData: () => void;
   onLogout: () => void;
+  onOpenChatbot?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -17,6 +18,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenHowItWorks,
   onLoadDemoData,
   onLogout,
+  onOpenChatbot,
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
@@ -33,12 +35,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                 AI
               </span>
             </div>
-            <p className="text-[10px] text-slate-500 font-medium">Diagnostic RAG Study Engine</p>
+            <p className="text-[10px] text-slate-500 font-medium">Bridge Your Gap</p>
           </div>
         </Link>
 
         {/* Center Pill: RAG & Model status */}
-        <div className="hidden md:flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50/80 px-3.5 py-1 text-xs text-slate-600">
+        <div className="hidden lg:flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50/80 px-3.5 py-1 text-xs text-slate-600">
           <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="font-medium text-slate-700">RAG Grounded</span>
           <span className="text-slate-300">|</span>
@@ -46,15 +48,27 @@ export const Navbar: React.FC<NavbarProps> = ({
           <span className="font-mono text-[11px] text-slate-500">gpt-oss-120b (Groq)</span>
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-3">
+        {/* Actions & Top Chatbot */}
+        <div className="flex items-center gap-2.5">
+          {/* Top Chatbot Button */}
+          {onOpenChatbot && (
+            <button
+              onClick={onOpenChatbot}
+              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-md shadow-indigo-600/20 hover:opacity-95 transition"
+              title="Open Interactive RAG Chatbot"
+            >
+              <Bot className="h-3.5 w-3.5 text-indigo-200" />
+              <span>Ask AI Tutor</span>
+            </button>
+          )}
+
           <button
             onClick={onOpenHowItWorks}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 shadow-sm"
+            className="hidden sm:flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 shadow-xs"
             title="Interactive RAG Diagnostic Flowchart"
           >
             <HelpCircle className="h-4 w-4 text-indigo-600" />
-            <span className="hidden sm:inline">How It Works</span>
+            <span>How It Works</span>
           </button>
 
           <button
@@ -63,7 +77,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             title="Preload Biology Course, Citations & Exam Data"
           >
             <Sparkles className="h-3.5 w-3.5 text-indigo-600" />
-            <span>Load Demo Exam</span>
+            <span className="hidden sm:inline">Load Demo Exam</span>
+            <span className="sm:hidden">Demo</span>
           </button>
 
           {user ? (
@@ -71,7 +86,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-xs font-bold text-white shadow-sm">
                 {user.name.charAt(0)}
               </div>
-              <div className="hidden sm:block text-left text-xs">
+              <div className="hidden md:block text-left text-xs">
                 <p className="font-medium text-slate-900 leading-tight">{user.name}</p>
                 <p className="text-[10px] text-indigo-600 font-semibold uppercase tracking-wider">
                   {user.role}
@@ -90,7 +105,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               href="/login"
               className="rounded-lg bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-indigo-700 transition"
             >
-              Judge Login
+              Sign In / Guest
             </Link>
           )}
         </div>

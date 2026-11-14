@@ -3,12 +3,12 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Brain, Lock, Mail, Sparkles, ArrowRight, ShieldCheck } from "lucide-react";
+import { Brain, Lock, Mail, Sparkles, ArrowRight, ShieldCheck, UserCheck } from "lucide-react";
 import { UserSession } from "@/lib/types";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("demo@gapfinder.ai");
+  const [email, setEmail] = useState("student@gapfinder.ai");
   const [password, setPassword] = useState("password123");
   const [loading, setLoading] = useState(false);
 
@@ -18,9 +18,9 @@ export default function LoginPage() {
 
     const session: UserSession = {
       email,
-      name: email === "demo@gapfinder.ai" ? "Dr. Alex Vance (Hackathon Judge)" : "Demo Student",
-      role: "judge",
-      isDemoUser: true,
+      name: email.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Student",
+      role: "student",
+      isDemoUser: false,
     };
 
     localStorage.setItem("gapfinder_user", JSON.stringify(session));
@@ -28,16 +28,14 @@ export default function LoginPage() {
     setTimeout(() => {
       setLoading(false);
       router.push("/dashboard");
-    }, 400);
+    }, 350);
   };
 
-  const handleQuickJudgeLogin = () => {
-    setEmail("demo@gapfinder.ai");
-    setPassword("password123");
+  const handleGuestLogin = () => {
     const session: UserSession = {
-      email: "demo@gapfinder.ai",
-      name: "Dr. Alex Vance (Hackathon Judge)",
-      role: "judge",
+      email: "guest@gapfinder.ai",
+      name: "Guest Student",
+      role: "guest",
       isDemoUser: true,
     };
     localStorage.setItem("gapfinder_user", JSON.stringify(session));
@@ -55,31 +53,39 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
             GapFinder <span className="text-indigo-600">AI</span>
           </h1>
+          <p className="text-xs font-semibold text-indigo-600 tracking-wide uppercase">
+            Bridge Your Gap
+          </p>
           <p className="text-xs text-slate-500">
-            Find What the Student Doesn’t Know • Diagnostic RAG Platform
+            Find What You Don't Know • Diagnostic RAG Learning Engine
           </p>
         </div>
 
-        {/* 1-Click Judge Button */}
+        {/* 1-Click Guest Button */}
         <div className="rounded-2xl border border-indigo-200 bg-indigo-50/70 p-4 text-center space-y-2 shadow-xs">
           <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-indigo-900">
             <Sparkles className="h-4 w-4 text-indigo-600" />
-            <span>Hackathon Judge 1-Click Access</span>
+            <span>Instant Guest Access</span>
           </div>
           <p className="text-[11px] text-indigo-700">
-            Preloads demo student session with full course datasets & citations.
+            Explore with instant 1-click access and ready-to-test course data.
           </p>
           <button
-            onClick={handleQuickJudgeLogin}
+            onClick={handleGuestLogin}
             className="w-full rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 transition flex items-center justify-center gap-2"
           >
-            <span>Log In as Demo Judge</span>
+            <UserCheck className="h-4 w-4" />
+            <span>Continue as Guest</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </button>
         </div>
 
-        {/* Form Card */}
+        {/* Form Card for Registered / Custom Student Credentials */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="mb-4 text-center">
+            <span className="text-xs font-bold text-slate-700">Or Log In With Your Account</span>
+          </div>
+
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
@@ -91,6 +97,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  placeholder="student@school.edu"
                   required
                   className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-3 text-xs focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
@@ -107,6 +114,7 @@ export default function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
                   required
                   className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-3 text-xs focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
@@ -118,7 +126,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full rounded-xl bg-slate-900 py-2.5 text-xs font-bold text-white hover:bg-slate-800 transition disabled:opacity-50"
             >
-              {loading ? "Authenticating..." : "Sign In to GapFinder"}
+              {loading ? "Authenticating..." : "Sign In with Student Account"}
             </button>
           </form>
 
@@ -127,13 +135,13 @@ export default function LoginPage() {
               <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
               Demo Credentials:
             </span>
-            <span className="font-mono text-slate-700">demo@gapfinder.ai / password123</span>
+            <span className="font-mono text-slate-700">student@gapfinder.ai / password123</span>
           </div>
         </div>
 
         <div className="text-center">
           <Link href="/" className="text-xs font-semibold text-indigo-600 hover:text-indigo-700">
-            ← Back to Product Overview
+            ← Back to Overview
           </Link>
         </div>
       </div>

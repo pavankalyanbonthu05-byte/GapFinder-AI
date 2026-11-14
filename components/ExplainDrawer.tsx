@@ -29,12 +29,13 @@ export const ExplainDrawer: React.FC<ExplainDrawerProps> = ({
   topicName,
   chunks,
 }) => {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, setInput } =
+  const { messages, input, handleInputChange, handleSubmit, isLoading, setInput, setMessages } =
     useChat({
       api: "/api/chat",
       body: {
         chunks,
         activeTopicId: topicId,
+        activeTopicName: topicName,
       },
     });
 

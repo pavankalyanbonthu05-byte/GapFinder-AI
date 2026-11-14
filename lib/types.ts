@@ -93,6 +93,6 @@ export interface GapDiagnosisReport {
 export interface UserSession {
   email: string;
   name: string;
-  role: "student" | "judge" | "teacher";
+  role: "student" | "guest" | "teacher" | "judge";
   isDemoUser: boolean;
 }

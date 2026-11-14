@@ -14,6 +14,7 @@ import {
   BookOpen,
   CalendarCheck,
   Cpu,
+  UserCheck,
 } from "lucide-react";
 import { InteractiveDiagram } from "@/components/InteractiveDiagram";
 
@@ -34,7 +35,7 @@ export default function HomePage() {
                   AI
                 </span>
               </div>
-              <p className="text-[10px] text-slate-500 font-medium">Ed-Tech Diagnostic RAG Engine</p>
+              <p className="text-[10px] text-slate-500 font-medium">Bridge Your Gap</p>
             </div>
           </div>
 
@@ -43,7 +44,7 @@ export default function HomePage() {
               href="/login"
               className="text-xs font-semibold text-slate-700 hover:text-indigo-600 transition"
             >
-              Judge Login
+              Sign In / Guest
             </Link>
             <Link
               href="/dashboard"
@@ -60,23 +61,22 @@ export default function HomePage() {
       <section className="relative overflow-hidden pt-12 pb-16 lg:pt-20 lg:pb-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50/80 px-3.5 py-1 text-xs font-semibold text-indigo-700 shadow-xs">
+            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50/80 px-4 py-1 text-xs font-semibold text-indigo-700 shadow-xs">
               <Sparkles className="h-3.5 w-3.5 text-indigo-600" />
-              <span>Hackathon PS 2026: Find What the Student Doesn’t Know</span>
+              <span>Bridge Your Gap • AI Diagnostic Learning Engine</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 leading-tight">
-              A Doctor for Studying. <br />
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-tight">
+              Stop Re-reading What You Already Know. <br />
               <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
-                Diagnosis, Not Just Answers.
+                Uncover Your Blind Spots Before Your Exam Does.
               </span>
             </h1>
 
-            <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-              Most study tools wait for the student to ask questions. But a student can’t ask about
-              a gap they don’t know they have. GapFinder AI ingests your syllabus and notes, tests
-              you with citation-grounded questions, isolates weak spots, and builds an adaptive
-              revision plan.
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto">
+              Most study tools wait for you to ask questions. But you can’t ask about a gap you
+              don’t know you have. GapFinder AI ingests your syllabus and notes, tests you with
+              citation-grounded questions, isolates weak spots, and builds a personalized revision plan.
             </p>
 
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -91,7 +91,8 @@ export default function HomePage() {
                 href="/login"
                 className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 transition shadow-xs"
               >
-                <span>1-Click Hackathon Judge Login</span>
+                <UserCheck className="h-4 w-4 text-indigo-600" />
+                <span>Continue as Guest (1-Click)</span>
               </Link>
             </div>
 
@@ -120,7 +121,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-              Built to Solve the 5 Mandatory Requirements
+              A Complete System for Knowledge Mastery
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
               Zero hallucination, grounded generation, algorithmic gap diagnosis, and adaptive scheduling.
@@ -178,8 +179,8 @@ export default function HomePage() {
               </div>
               <h3 className="text-base font-bold text-slate-900">5. "Explain Topic" Tutor</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                RAG assistant embedded directly on weak cards that refuses to hallucinate and cites
-                only uploaded materials.
+                RAG assistant that evaluates retrieved material and frames explanations with plain-English analogies,
+                breakdowns, and verified citations.
               </p>
             </div>
 
@@ -187,9 +188,9 @@ export default function HomePage() {
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
                 <Brain className="h-5 w-5" />
               </div>
-              <h3 className="text-base font-bold text-slate-900">6. Ready for Hackathon Judges</h3>
+              <h3 className="text-base font-bold text-slate-900">6. Turnkey Guest & Student Access</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                1-click judge credentials and turnkey course data preloaded. Zero configuration required to test.
+                1-click guest access and preloaded course datasets. Zero configuration required to start learning.
               </p>
             </div>
           </div>
@@ -198,7 +199,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="border-t border-slate-200 bg-slate-50 py-8 text-center text-xs text-slate-500">
-        <p>© 2026 GapFinder AI • Built for AI Intern Hackathon 2026 • Powered by Groq & Vercel AI SDK</p>
+        <p>© 2026 GapFinder AI • Bridge Your Gap • Powered by Groq & Vercel AI SDK</p>
       </footer>
     </div>
   );
