@@ -18,6 +18,7 @@ interface DiagnosticQuizProps {
   questions: QuizQuestion[];
   topics: Topic[];
   chunks: DocumentChunk[];
+  isLoading?: boolean;
   onQuizCompleted: (answers: StudentAnswer[]) => void;
   onRetest: () => void;
 }
@@ -26,6 +27,7 @@ export const DiagnosticQuiz: React.FC<DiagnosticQuizProps> = ({
   questions,
   topics,
   chunks,
+  isLoading = false,
   onQuizCompleted,
   onRetest,
 }) => {
@@ -85,6 +87,30 @@ export const DiagnosticQuiz: React.FC<DiagnosticQuizProps> = ({
   };
 
   const allAnswered = Object.keys(selectedAnswers).length === questions.length;
+
+  if (isLoading) {
+    return (
+      <div className="rounded-2xl border border-indigo-100 bg-white p-12 text-center shadow-xs space-y-4">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
+          <Sparkles className="h-7 w-7 animate-spin" />
+        </div>
+        <div className="space-y-1.5">
+          <h3 className="text-base font-bold text-slate-900">
+            Generating Grounded Diagnostic Questions...
+          </h3>
+          <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+            Groq AI is analyzing your uploaded topics and weighting questions according to exam frequency.
+            Extracting exact textbook citations and section references...
+          </p>
+        </div>
+        <div className="flex items-center justify-center gap-2 pt-2 text-xs font-semibold text-indigo-600">
+          <div className="h-2 w-2 rounded-full bg-indigo-600 animate-bounce" />
+          <div className="h-2 w-2 rounded-full bg-indigo-600 animate-bounce [animation-delay:0.2s]" />
+          <div className="h-2 w-2 rounded-full bg-indigo-600 animate-bounce [animation-delay:0.4s]" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

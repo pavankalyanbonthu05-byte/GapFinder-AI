@@ -51,6 +51,7 @@ export default function DashboardPage() {
   const [topics, setTopics] = useState<Topic[]>(SAMPLE_TOPICS);
   const [chunks, setChunks] = useState<DocumentChunk[]>(SAMPLE_CHUNKS);
   const [questions, setQuestions] = useState<QuizQuestion[]>(SAMPLE_QUIZ_QUESTIONS);
+  const [isGeneratingQuiz, setIsGeneratingQuiz] = useState<boolean>(false);
   const [report, setReport] = useState<GapDiagnosisReport | null>(null);
 
   // Explain Drawer State
@@ -101,17 +102,52 @@ export default function DashboardPage() {
     setTopics(SAMPLE_TOPICS);
     setChunks(SAMPLE_CHUNKS);
     setQuestions(SAMPLE_QUIZ_QUESTIONS);
+    setReport(null);
+    localStorage.removeItem("gapfinder_report");
     setActiveTab("topic-map");
+  };
+
+  const generateQuizForTopics = async (targetTopics: Topic[], targetChunks: DocumentChunk[]) => {
+    setIsGeneratingQuiz(true);
+    try {
+      const res = await fetch("/api/quiz", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          topics: targetTopics,
+          chunks: targetChunks,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Quiz generation failed");
+      const data = await res.json();
+      if (data.questions && data.questions.length > 0) {
+        setQuestions(data.questions);
+      }
+    } catch (err) {
+      console.error("Failed to generate quiz for new material:", err);
+    } finally {
+      setIsGeneratingQuiz(false);
+    }
   };
 
   const handleIngestionComplete = (newTopics: Topic[], newChunks: DocumentChunk[]) => {
     setTopics(newTopics);
     setChunks(newChunks);
+    // Clear previous demo questions and report so the user gets a fresh exam tailored to their upload
+    setQuestions([]);
+    setReport(null);
+    localStorage.removeItem("gapfinder_report");
     setActiveTab("topic-map");
+
+    // Immediately trigger quiz generation based on the newly extracted topics and their exam weightage
+    generateQuizForTopics(newTopics, newChunks);
   };
 
   const handleStartQuiz = async () => {
-    // If questions aren't generated or are from a different set, generate from Groq or use ready set
+    if (questions.length === 0 && !isGeneratingQuiz) {
+      await generateQuizForTopics(topics, chunks);
+    }
     setActiveTab("quiz");
   };
 
@@ -195,7 +231,11 @@ export default function DashboardPage() {
             <HelpCircle className="h-4 w-4" />
             <span>3. Grounded Diagnostic Test</span>
             <span className="rounded-md bg-indigo-100 px-1.5 py-0.2 text-[10px] text-indigo-700 font-mono">
-              {questions.length} Qs
+              {isGeneratingQuiz
+                ? "Generating..."
+                : questions.length > 0
+                ? `${questions.length} Qs`
+                : "0 Qs"}
             </span>
           </button>
 
@@ -238,7 +278,12 @@ export default function DashboardPage() {
         )}
 
         {activeTab === "topic-map" && (
-          <TopicMapTree topics={topics} onStartQuiz={handleStartQuiz} />
+          <TopicMapTree
+            topics={topics}
+            questionsCount={questions.length}
+            isGeneratingQuiz={isGeneratingQuiz}
+            onStartQuiz={handleStartQuiz}
+          />
         )}
 
         {activeTab === "quiz" && (
@@ -246,6 +291,7 @@ export default function DashboardPage() {
             questions={questions}
             topics={topics}
             chunks={chunks}
+            isLoading={isGeneratingQuiz}
             onQuizCompleted={handleQuizCompleted}
             onRetest={() => setActiveTab("quiz")}
           />
@@ -270,7 +316,7 @@ export default function DashboardPage() {
                 </p>
               </div>
               <button
-                onClick={() => setActiveTab("quiz")}
+                onClick={handleStartQuiz}
                 className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 transition"
               >
                 <span>Take Diagnostic Exam Now</span>
@@ -299,7 +345,7 @@ export default function DashboardPage() {
                 </p>
               </div>
               <button
-                onClick={() => setActiveTab("quiz")}
+                onClick={handleStartQuiz}
                 className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 transition"
               >
                 <span>Take Diagnostic Exam</span>

@@ -15,11 +15,15 @@ import { Topic } from "@/lib/types";
 
 interface TopicMapTreeProps {
   topics: Topic[];
+  questionsCount?: number;
+  isGeneratingQuiz?: boolean;
   onStartQuiz: () => void;
 }
 
 export const TopicMapTree: React.FC<TopicMapTreeProps> = ({
   topics,
+  questionsCount = 0,
+  isGeneratingQuiz = false,
   onStartQuiz,
 }) => {
   const totalSubtopics = topics.reduce((acc, t) => acc + t.subtopics.length, 0);
@@ -36,6 +40,15 @@ export const TopicMapTree: React.FC<TopicMapTreeProps> = ({
             <span className="text-xs text-slate-500 font-medium">
               {topics.length} Core Modules • {totalSubtopics} Subtopics
             </span>
+            {isGeneratingQuiz ? (
+              <span className="flex items-center gap-1 text-[11px] font-semibold text-indigo-600 animate-pulse bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">
+                <Sparkles className="h-3 w-3 animate-spin" /> Generating Quiz from Weightage...
+              </span>
+            ) : questionsCount > 0 ? (
+              <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                ✓ {questionsCount} Grounded Qs Ready
+              </span>
+            ) : null}
           </div>
           <h2 className="text-xl font-bold text-slate-900 mt-1">
             Curriculum Structure & Exam Weightage
@@ -48,10 +61,15 @@ export const TopicMapTree: React.FC<TopicMapTreeProps> = ({
 
         <button
           onClick={onStartQuiz}
-          className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 transition"
+          disabled={isGeneratingQuiz}
+          className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-700 disabled:opacity-50 transition"
         >
           <Sparkles className="h-4 w-4" />
-          <span>Launch Grounded Diagnostic Quiz</span>
+          <span>
+            {isGeneratingQuiz
+              ? "Generating Grounded Quiz..."
+              : `Launch Grounded Diagnostic Quiz (${questionsCount} Qs)`}
+          </span>
           <ArrowRight className="h-3.5 w-3.5" />
         </button>
       </div>
