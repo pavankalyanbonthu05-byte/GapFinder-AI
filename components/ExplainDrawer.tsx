@@ -211,6 +211,20 @@ export const ExplainDrawer: React.FC<ExplainDrawerProps> = ({
                                 {...props}
                               />
                             ),
+                            table: ({ node, ...props }) => (
+                              <div className="overflow-x-auto my-3 rounded-xl border border-slate-200 bg-white shadow-2xs">
+                                <table className="min-w-full divide-y divide-slate-200 text-[11px]" {...props} />
+                              </div>
+                            ),
+                            thead: ({ node, ...props }) => (
+                              <thead className="bg-slate-100/80 font-bold text-slate-800" {...props} />
+                            ),
+                            th: ({ node, ...props }) => (
+                              <th className="px-3 py-2 text-left font-semibold text-slate-700" {...props} />
+                            ),
+                            td: ({ node, ...props }) => (
+                              <td className="px-3 py-1.5 border-t border-slate-100 text-slate-700" {...props} />
+                            ),
                           }}
                         >
                           {m.content}
