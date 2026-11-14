@@ -18,6 +18,7 @@ import {
   Globe,
 } from "lucide-react";
 import { DocumentChunk } from "@/lib/types";
+import { polishText } from "@/lib/cleanText";
 
 interface ExplainDrawerProps {
   isOpen: boolean;
@@ -227,7 +228,7 @@ export const ExplainDrawer: React.FC<ExplainDrawerProps> = ({
                             ),
                           }}
                         >
-                          {m.content}
+                          {polishText(m.content)}
                         </ReactMarkdown>
                       </div>
                     ) : (
