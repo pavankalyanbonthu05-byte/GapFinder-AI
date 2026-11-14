@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/groq": "^1.1.10",
+    "@tailwindcss/typography": "^0.5.20",
     "ai": "^4.1.45",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",

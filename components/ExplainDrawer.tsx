@@ -183,59 +183,8 @@ export const ExplainDrawer: React.FC<ExplainDrawerProps> = ({
                     }`}
                   >
                     {isAssistant ? (
-                      <div className="prose prose-xs max-w-none text-slate-800 space-y-2.5">
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm]}
-                          components={{
-                            h3: ({ node, ...props }) => (
-                              <h3 className="text-sm font-bold text-slate-900 mt-2 mb-1" {...props} />
-                            ),
-                            h4: ({ node, ...props }) => (
-                              <h4 className="text-xs font-bold text-slate-900 mt-2 mb-1" {...props} />
-                            ),
-                            p: ({ node, ...props }) => (
-                              <p className="leading-relaxed mb-1.5" {...props} />
-                            ),
-                            ul: ({ node, ...props }) => (
-                              <ul className="list-disc pl-4 space-y-1 mb-2" {...props} />
-                            ),
-                            ol: ({ node, ...props }) => (
-                              <ol className="list-decimal pl-4 space-y-1 mb-2" {...props} />
-                            ),
-                            li: ({ node, ...props }) => (
-                              <li className="leading-relaxed" {...props} />
-                            ),
-                            blockquote: ({ node, ...props }) => (
-                              <blockquote
-                                className="border-l-3 border-indigo-500 bg-indigo-50/60 p-2.5 my-2 rounded-r-lg text-indigo-950 font-medium italic"
-                                {...props}
-                              />
-                            ),
-                            strong: ({ node, ...props }) => (
-                              <strong className="font-bold text-slate-900" {...props} />
-                            ),
-                            code: ({ node, ...props }) => (
-                              <code
-                                className="rounded bg-slate-200/70 px-1 py-0.5 font-mono text-[11px] text-indigo-700"
-                                {...props}
-                              />
-                            ),
-                            table: ({ node, ...props }) => (
-                              <div className="overflow-x-auto my-3 rounded-xl border border-slate-200 bg-white shadow-2xs">
-                                <table className="min-w-full divide-y divide-slate-200 text-[11px]" {...props} />
-                              </div>
-                            ),
-                            thead: ({ node, ...props }) => (
-                              <thead className="bg-slate-100/80 font-bold text-slate-800" {...props} />
-                            ),
-                            th: ({ node, ...props }) => (
-                              <th className="px-3 py-2 text-left font-semibold text-slate-700" {...props} />
-                            ),
-                            td: ({ node, ...props }) => (
-                              <td className="px-3 py-1.5 border-t border-slate-100 text-slate-700" {...props} />
-                            ),
-                          }}
-                        >
+                      <div className="prose prose-slate max-w-none text-slate-700 text-xs">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
                           {polishText(m.content)}
                         </ReactMarkdown>
                       </div>
