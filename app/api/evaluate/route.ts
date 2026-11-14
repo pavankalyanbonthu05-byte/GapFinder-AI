@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { groqClient, GROQ_MODEL } from "@/lib/groq";
+import { createGroqChatCompletion } from "@/lib/groq";
 import {
   Topic,
   QuizQuestion,
@@ -158,7 +158,7 @@ Return valid JSON with:
   ]
 }`;
 
-    const completion = await groqClient.chat.completions.create({
+    const completion = await createGroqChatCompletion({
       messages: [
         {
           role: "system",
@@ -167,7 +167,6 @@ Return valid JSON with:
         },
         { role: "user", content: prompt },
       ],
-      model: GROQ_MODEL,
       response_format: { type: "json_object" },
       temperature: 0.2,
       max_tokens: 2500,

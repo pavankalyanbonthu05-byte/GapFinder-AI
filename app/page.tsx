@@ -98,7 +98,7 @@ export default function HomePage() {
                 <ShieldCheck className="h-4 w-4 text-emerald-600" /> Grounded RAG with Citations
               </span>
               <span className="flex items-center gap-1.5 font-medium">
-                <Cpu className="h-4 w-4 text-indigo-600" /> Groq Llama-3.3-70b
+                <Cpu className="h-4 w-4 text-indigo-600" /> Groq GPT-OSS-120b
               </span>
               <span className="flex items-center gap-1.5 font-medium">
                 <Activity className="h-4 w-4 text-purple-600" /> Adaptive 5-Day Plan

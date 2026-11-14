@@ -43,7 +43,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <span className="font-medium text-slate-700">RAG Grounded</span>
           <span className="text-slate-300">|</span>
           <Cpu className="h-3.5 w-3.5 text-indigo-500" />
-          <span className="font-mono text-[11px] text-slate-500">llama-3.3-70b (Groq)</span>
+          <span className="font-mono text-[11px] text-slate-500">gpt-oss-120b (Groq)</span>
         </div>
 
         {/* Actions */}

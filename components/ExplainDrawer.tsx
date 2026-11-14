@@ -88,7 +88,7 @@ export const ExplainDrawer: React.FC<ExplainDrawerProps> = ({
             <ShieldCheck className="h-3.5 w-3.5 text-indigo-600" />
             Answers strictly from your uploaded notes chunks. Zero hallucination.
           </span>
-          <span className="text-[10px] font-mono text-indigo-500">Groq 70b</span>
+          <span className="text-[10px] font-mono text-indigo-500">Groq 120b</span>
         </div>
 
         {/* Messages List */}

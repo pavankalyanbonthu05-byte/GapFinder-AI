@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { groqClient, GROQ_MODEL } from "@/lib/groq";
+import { createGroqChatCompletion } from "@/lib/groq";
 import { Topic, DocumentChunk, QuizQuestion } from "@/lib/types";
 
 export async function POST(req: NextRequest) {
@@ -66,12 +66,11 @@ ${contextText.slice(0, 10000)}
 Please generate ${countPerTopic} high-yield diagnostic questions per topic. Focus on testing comprehension and common student misconceptions.
 `;
 
-    const chatCompletion = await groqClient.chat.completions.create({
+    const chatCompletion = await createGroqChatCompletion({
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
-      model: GROQ_MODEL,
       response_format: { type: "json_object" },
       temperature: 0.1, // low temperature for high fidelity to chunks
       max_tokens: 3500,

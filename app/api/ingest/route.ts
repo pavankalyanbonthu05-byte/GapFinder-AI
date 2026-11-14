@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { groqClient, GROQ_MODEL } from "@/lib/groq";
+import { createGroqChatCompletion } from "@/lib/groq";
 import { Topic, DocumentChunk } from "@/lib/types";
 
 export async function POST(req: NextRequest) {
@@ -67,12 +67,11 @@ PAST EXAM PAPERS:
 ${pastPapersText ? pastPapersText.slice(0, 4000) : "Not provided"}
 `;
 
-    const chatCompletion = await groqClient.chat.completions.create({
+    const chatCompletion = await createGroqChatCompletion({
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userContent },
       ],
-      model: GROQ_MODEL,
       response_format: { type: "json_object" },
       temperature: 0.2,
       max_tokens: 3000,

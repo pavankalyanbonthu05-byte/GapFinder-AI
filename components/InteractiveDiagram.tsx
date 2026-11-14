@@ -32,7 +32,7 @@ const STEPS: StepInfo[] = [
     ragRole: "Information Extraction & Chunking with source metadata (Page, Section)",
     details: [
       "Uploads Syllabus, textbook chapters, and past exam questions.",
-      "Llama-3.3-70b parses topic hierarchy and calculates exam question weights.",
+      "Groq AI parses topic hierarchy and calculates exam question weights.",
       "Text is sliced into semantic chunks with verified source citations.",
     ],
   },
