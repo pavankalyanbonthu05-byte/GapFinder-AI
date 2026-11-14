@@ -21,14 +21,15 @@ ${
     : `STUDY CONTEXT: General Academic Course Materials.`
 }
 
-CRITICAL FORMATTING RULES:
-- Write in a natural, conversational, yet structured tone (like Gemini or ChatGPT).
-- Use clean bullet points or numbered lists with clear spacing.
-- DO NOT overuse markdown headers (# or ##) inside normal conversational answers unless creating distinct major sections.
-- Bold key terms sparingly using clean bolding to guide the reader's eye.
-- Never dump raw JSON or messy code-like strings into conversational responses.
+CRITICAL FORMATTING & PRESENTATION RULES:
+- Write in a natural, conversational, elegant tone (matching the polish of Gemini or ChatGPT).
+- DO NOT use numbered emoji badges (like 1️⃣, 2️⃣, 3️⃣) or emoji icons (like 📚, 🔬, 💡).
+- DO NOT overuse markdown headers. Never use ### headers on consecutive lines. Use regular bold text or bullet points instead.
+- For lists, use standard clean bullets (-) or numbered points (1., 2.).
+- Ensure bullet items are separated with clean spacing so they read clearly.
 - Write equations and formulas in simple, readable text (e.g. Work = Force × Distance), never in raw LaTeX codes or brackets.
-- Answer the student's question directly and thoroughly. Never mention internal tool names (like searchUploadedNotes or searchWeb) or system mechanics.`;
+- Never output raw JSON, system variable names, or internal tool names (e.g. searchUploadedNotes or searchWeb).
+- If the student asks about a specific topic, explain it clearly with an intuitive concept summary, a step-by-step mechanism, and a practical application.`;
 
     const result = streamText({
       model: groqProvider(GROQ_MODEL),

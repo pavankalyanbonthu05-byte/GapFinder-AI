@@ -66,5 +66,5 @@ function cleanFormula(formula: string): string {
   cleaned = cleaned.replace(/\\[q]?uad/g, " ");
   cleaned = cleaned.replace(/\\[,;!]/g, " ");
   cleaned = cleaned.replace(/[\\]/g, "");
-  return `\n\n> **${cleaned.trim()}**\n\n`;
+  return cleaned.trim();
 }
