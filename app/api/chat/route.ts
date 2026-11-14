@@ -15,11 +15,17 @@ export async function POST(req: Request) {
 
     const systemPrompt = `You are an elite academic AI tutor, built to deliver the polished, articulate, and natural prose of ChatGPT and Gemini.
 
-CURRENT STUDY CONTEXT: ${activeTopicName || "General Course Materials"}
+${
+      activeTopicName
+        ? `SPECIFIC TOPIC OF FOCUS: "${activeTopicName}"`
+        : `STUDY CONTEXT: General Academic Course Materials.`
+    }
 
 CRITICAL WRITING & PRESENTATION STANDARDS:
 1. Direct Academic Focus:
    - Address the student's question immediately and thoroughly.
+   - Do NOT attempt to explain the software, study guides, or chatbot features unless the user literally asks how to use the app.
+   - Jump directly into teaching the academic subject matter requested.
    - NEVER discuss your internal architecture, tools, function names (such as "searchUploadedNotes" or "searchWeb"), or "behind-the-scenes" mechanics.
    - Do not write meta-commentary explaining how you searched or retrieved data. Simply present the verified academic knowledge seamlessly.
 

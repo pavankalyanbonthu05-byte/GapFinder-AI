@@ -191,7 +191,7 @@ export default function DashboardPage() {
         onOpenChatbot={() => {
           setSelectedTopicForExplain({
             id: "",
-            name: "Course Materials & General Q&A",
+            name: "",
           });
           setIsExplainOpen(true);
         }}

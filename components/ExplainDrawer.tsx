@@ -53,11 +53,19 @@ export const ExplainDrawer: React.FC<ExplainDrawerProps> = ({
 
   if (!isOpen) return null;
 
-  const quickPrompts = [
-    `Explain ${topicName} with an intuitive analogy.`,
-    `What are the most common exam traps in ${topicName}?`,
-    `Compare how ${topicName} in my notes relates to real-world applications.`,
-  ];
+  const isSpecificTopic = Boolean(topicName && topicName.trim().length > 0);
+
+  const quickPrompts = isSpecificTopic
+    ? [
+        `Explain ${topicName} step-by-step.`,
+        `What are the most common exam traps in ${topicName}?`,
+        `Give me a clear real-world application of ${topicName}.`,
+      ]
+    : [
+        "Which high-weight topics in my syllabus should I study first?",
+        "Explain the most critical concept from my uploaded notes.",
+        "Test me with a high-yield diagnostic question from my syllabus.",
+      ];
 
   const handleResetChat = () => {
     setMessages([]);
@@ -80,7 +88,7 @@ export const ExplainDrawer: React.FC<ExplainDrawerProps> = ({
                 </span>
               </div>
               <p className="text-xs text-indigo-700 font-semibold truncate max-w-sm">
-                Topic: {topicName || "General & Course Material"}
+                {isSpecificTopic ? `Topic: ${topicName}` : "General Study & Course Assistant"}
               </p>
             </div>
           </div>
@@ -123,7 +131,7 @@ export const ExplainDrawer: React.FC<ExplainDrawerProps> = ({
               </div>
               <div className="space-y-1">
                 <h4 className="text-base font-bold text-slate-900">
-                  Ask Anything About "{topicName || "Your Course"}"
+                  {isSpecificTopic ? `Ask Anything About "${topicName}"` : "Ask Anything About Your Course"}
                 </h4>
                 <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
                   Ask specific questions, request real-world comparisons, or ask general questions.
