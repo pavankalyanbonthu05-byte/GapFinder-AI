@@ -21,22 +21,24 @@ ${
     : `STUDY CONTEXT: General Academic Course Materials.`
 }
 
-CRITICAL FORMATTING & PRESENTATION RULES:
+CRITICAL RULES (STRICT COURSE GROUNDING):
+- Rely strictly and exclusively on the student's uploaded materials and notes retrieved via searchUploadedNotes.
+- Do NOT pull outside internet information or web search results for course syllabus questions.
 - Write in a natural, conversational, elegant tone (matching the polish of Gemini or ChatGPT).
 - DO NOT use numbered emoji badges (like 1️⃣, 2️⃣, 3️⃣) or emoji icons (like 📚, 🔬, 💡).
 - DO NOT overuse markdown headers. Never use ### headers on consecutive lines. Use regular bold text or bullet points instead.
 - For lists, use standard clean bullets (-) or numbered points (1., 2.).
 - Ensure bullet items are separated with clean spacing so they read clearly.
-- Write equations and formulas in simple, readable text (e.g. Work = Force × Distance), never in raw LaTeX codes or brackets.
+- Write equations and formulas in simple, readable text (e.g. Bandwidth-Delay Product = Bandwidth × RTT), never in raw LaTeX codes or brackets.
 - Never output raw JSON, system variable names, or internal tool names (e.g. searchUploadedNotes or searchWeb).
-- If the student asks about a specific topic, explain it clearly with an intuitive concept summary, a step-by-step mechanism, and a practical application.`;
+- Cite the relevant section or page from the student's notes when explaining a concept.`;
 
     const result = streamText({
       model: groqProvider(GROQ_MODEL),
       system: systemPrompt,
       messages,
-      maxSteps: 4,
-      temperature: 0.25,
+      maxSteps: 3,
+      temperature: 0.2,
       tools: {
         searchUploadedNotes: tool({
           description:
@@ -65,22 +67,6 @@ CRITICAL FORMATTING & PRESENTATION RULES:
               page: c.pageOrSlide || "N/A",
               passage: c.content,
             }));
-          },
-        }),
-
-        searchWeb: tool({
-          description:
-            "Search external live web knowledge for out-of-topic questions, real-world context, or concepts not covered in the student's notes.",
-          parameters: z.object({
-            query: z.string().describe("Search query for web knowledge"),
-          }),
-          execute: async ({ query }) => {
-            const webData = await searchWebKnowledge(query);
-            return {
-              source: webData.source,
-              title: webData.title,
-              snippet: webData.snippet,
-            };
           },
         }),
       },

@@ -32,11 +32,15 @@ export default function LoginPage() {
   };
 
   const handleGuestLogin = () => {
+    // Generate a unique guest identifier so each guest device / session gets their own clean sandbox
+    const randomGuestNum = Math.floor(1000 + Math.random() * 9000);
+    const guestId = `guest_${Date.now()}_${randomGuestNum}`;
     const session: UserSession = {
-      email: "guest@gapfinder.ai",
-      name: "Guest Student",
+      email: `guest_${randomGuestNum}@gapfinder.ai`,
+      name: `Guest #${randomGuestNum}`,
       role: "guest",
       isDemoUser: true,
+      guestId,
     };
     localStorage.setItem("gapfinder_user", JSON.stringify(session));
     router.push("/dashboard");

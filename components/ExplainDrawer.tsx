@@ -84,7 +84,7 @@ export const ExplainDrawer: React.FC<ExplainDrawerProps> = ({
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-bold text-slate-900">GapFinder AI Tutor</h3>
                 <span className="rounded-full bg-indigo-100 px-2 py-0.2 text-[10px] font-bold text-indigo-700 flex items-center gap-1">
-                  <Globe className="h-3 w-3" /> Notes + Web Tools
+                  <BookOpen className="h-3 w-3" /> Course Materials Assistant
                 </span>
               </div>
               <p className="text-xs text-indigo-700 font-semibold truncate max-w-sm">
@@ -117,7 +117,7 @@ export const ExplainDrawer: React.FC<ExplainDrawerProps> = ({
         <div className="bg-indigo-50/60 border-b border-indigo-100 px-6 py-2 flex items-center justify-between text-[11px] text-indigo-900">
           <span className="flex items-center gap-1.5 font-medium">
             <ShieldCheck className="h-3.5 w-3.5 text-indigo-600" />
-            Evaluated by LLM with live notes & web tool-calling.
+            Answers strictly grounded in your course syllabus and uploaded notes.
           </span>
           <span className="text-[10px] font-mono text-indigo-600 font-semibold">Groq 120B</span>
         </div>
@@ -254,9 +254,7 @@ export const ExplainDrawer: React.FC<ExplainDrawerProps> = ({
           {isLoading && (
             <div className="flex items-center gap-2 rounded-xl bg-indigo-50/80 border border-indigo-100 p-3 text-xs text-indigo-800 animate-pulse">
               <Search className="h-4 w-4 animate-spin text-indigo-600 shrink-0" />
-              <span>
-                Evaluating notes, querying web if needed, and synthesizing a polished explanation...
-              </span>
+              <span>Loading...</span>
             </div>
           )}
           <div ref={messagesEndRef} />

@@ -10,6 +10,8 @@ import {
   ArrowRight,
   Sparkles,
   RotateCcw,
+  Sliders,
+  Settings2,
 } from "lucide-react";
 import { StudyPlanDay, GapDiagnosisReport } from "@/lib/types";
 
@@ -17,14 +19,25 @@ interface RevisionPlannerProps {
   report: GapDiagnosisReport;
   onRetest: () => void;
   onOpenExplainTopic: (topicId: string, topicName: string) => void;
+  availableDays?: number;
+  hoursPerDay?: number;
+  onUpdatePlanSchedule?: (days: number, hours: number) => Promise<void>;
+  isRecalculating?: boolean;
 }
 
 export const RevisionPlanner: React.FC<RevisionPlannerProps> = ({
   report,
   onRetest,
   onOpenExplainTopic,
+  availableDays = 5,
+  hoursPerDay = 2,
+  onUpdatePlanSchedule,
+  isRecalculating = false,
 }) => {
   const [completedDays, setCompletedDays] = useState<Record<number, boolean>>({});
+  const [customDays, setCustomDays] = useState<number>(availableDays);
+  const [customHours, setCustomHours] = useState<number>(hoursPerDay);
+  const [isCustomizing, setIsCustomizing] = useState(false);
 
   const toggleDayComplete = (dayNumber: number) => {
     setCompletedDays((prev) => ({
@@ -33,8 +46,17 @@ export const RevisionPlanner: React.FC<RevisionPlannerProps> = ({
     }));
   };
 
+  const handleApplySchedule = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (onUpdatePlanSchedule) {
+      await onUpdatePlanSchedule(customDays, customHours);
+      setIsCustomizing(false);
+    }
+  };
+
   const completedCount = Object.values(completedDays).filter(Boolean).length;
-  const totalDays = report.revisionPlan.length || 5;
+  const totalDays = report.revisionPlan.length || customDays;
+  const totalHours = report.revisionPlan.reduce((acc, curr) => acc + curr.allocatedHours, 0);
 
   return (
     <div className="space-y-6">
@@ -46,22 +68,26 @@ export const RevisionPlanner: React.FC<RevisionPlannerProps> = ({
               Personalized Treatment Plan
             </span>
             <span className="text-xs text-slate-500 font-medium">
-              5 Days • 2 Hours/Day • Exam-Prioritized
+              {totalDays} {totalDays === 1 ? "Day / Session" : "Days"} • {customHours} Hours/Day ({totalHours} Total Hours)
             </span>
           </div>
           <h2 className="text-xl font-bold text-slate-900 mt-1">
             Dynamic Adaptive Revision Schedule
           </h2>
           <p className="text-xs text-slate-500 max-w-xl">
-            Calculated from: <code>Exam Importance × Topic Vulnerability</code>. Completing these high-impact
-            modules maximizes your score in minimal study time.
+            Calculated from: <code>Exam Importance × Topic Vulnerability</code>. Customize your timeline to fit your exact exam date.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="text-right text-xs">
-            <span className="font-bold text-slate-900">{completedCount} of {totalDays}</span> Days Completed
-          </div>
+          <button
+            onClick={() => setIsCustomizing(!isCustomizing)}
+            className="flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50/70 px-4 py-2 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition shadow-2xs"
+          >
+            <Sliders className="h-3.5 w-3.5" />
+            <span>Customize Timeline</span>
+          </button>
+
           <button
             onClick={onRetest}
             className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-xs"
@@ -71,6 +97,112 @@ export const RevisionPlanner: React.FC<RevisionPlannerProps> = ({
           </button>
         </div>
       </div>
+
+      {/* User Customization Bar */}
+      {isCustomizing && (
+        <form
+          onSubmit={handleApplySchedule}
+          className="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-5 space-y-4 animate-in fade-in duration-150"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs font-bold text-indigo-950">
+              <Settings2 className="h-4 w-4 text-indigo-600" />
+              <span>Tailor Study Schedule to Your Available Time</span>
+            </div>
+            <span className="text-[11px] text-slate-500">Instant AI Priority Reallocation</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Days Available Until Exam
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={1}
+                  max={30}
+                  value={customDays}
+                  onChange={(e) => setCustomDays(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 focus:border-indigo-500 focus:outline-none"
+                />
+                <span className="text-xs text-slate-500 font-medium whitespace-nowrap">
+                  {customDays === 1 ? "Day (Intensive)" : "Days"}
+                </span>
+              </div>
+              <div className="flex gap-1.5 mt-2">
+                {[1, 3, 5, 7, 10, 14].map((d) => (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => setCustomDays(d)}
+                    className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition ${
+                      customDays === d
+                        ? "bg-indigo-600 text-white"
+                        : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-100"
+                    }`}
+                  >
+                    {d}d
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Study Hours Per Day
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={1}
+                  max={12}
+                  value={customHours}
+                  onChange={(e) => setCustomHours(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 focus:border-indigo-500 focus:outline-none"
+                />
+                <span className="text-xs text-slate-500 font-medium whitespace-nowrap">
+                  Hours / Day
+                </span>
+              </div>
+              <div className="flex gap-1.5 mt-2">
+                {[1, 2, 4, 6, 8].map((h) => (
+                  <button
+                    key={h}
+                    type="button"
+                    onClick={() => setCustomHours(h)}
+                    className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition ${
+                      customHours === h
+                        ? "bg-indigo-600 text-white"
+                        : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-100"
+                    }`}
+                  >
+                    {h}h
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-indigo-100/60">
+            <button
+              type="button"
+              onClick={() => setIsCustomizing(false)}
+              className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isRecalculating}
+              className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-5 py-2 text-xs font-bold text-white hover:bg-indigo-700 disabled:opacity-50 transition shadow-xs"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>{isRecalculating ? "Recalculating Plan..." : "Regenerate Adaptive Schedule"}</span>
+            </button>
+          </div>
+        </form>
+      )}
 
       {/* Days Stack */}
       <div className="space-y-4">
@@ -102,7 +234,7 @@ export const RevisionPlanner: React.FC<RevisionPlannerProps> = ({
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">
-                        Day {day.dayNumber}
+                        {customDays === 1 ? `Phase ${day.dayNumber}` : `Day ${day.dayNumber}`}
                       </span>
                       <span className="text-slate-300">•</span>
                       <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600">
