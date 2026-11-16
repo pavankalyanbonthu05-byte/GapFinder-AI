@@ -90,9 +90,27 @@ export interface GapDiagnosisReport {
   summaryDiagnosis: string;
 }
 
+export interface QuizAttempt {
+  id: string;
+  attemptNumber: number;
+  timestamp: string;
+  scorePercentage: number;
+  totalQuestions: number;
+  correctQuestions: number;
+  topicBreakdown: {
+    topicId: string;
+    topicName: string;
+    scorePercentage: number;
+    correct: number;
+    total: number;
+    masteryLevel: MasteryLevel;
+  }[];
+}
+
 export interface UserSession {
   email: string;
   name: string;
   role: "student" | "guest" | "teacher" | "judge";
   isDemoUser: boolean;
+  guestId?: string;
 }

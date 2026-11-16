@@ -4,7 +4,7 @@ import { Topic, DocumentChunk, QuizQuestion } from "@/lib/types";
 
 export async function POST(req: NextRequest) {
   try {
-    const { topics, chunks } = await req.json();
+    const { topics, chunks, seed, attemptCount } = await req.json();
 
     if (!topics || topics.length === 0) {
       return NextResponse.json(
@@ -75,6 +75,8 @@ Return pure JSON with no markdown formatting:
 }`;
 
     const userPrompt = `
+ATTEMPT COUNT / RANDOM SEED: ${attemptCount || Date.now()} (Generate completely DIFFERENT and FRESH questions compared to previous attempts. Focus on different subtopics, formulas, and edge cases from the notes).
+
 TOPICS AND THEIR EXAM WEIGHTAGE:
 ${JSON.stringify(
   topics.map((t: Topic) => ({
@@ -90,7 +92,7 @@ ${JSON.stringify(
 DOCUMENT CHUNKS (SOURCE TRUTH):
 ${contextText.slice(0, 12000)}
 
-Generate the complete diagnostic quiz now. Allocate more questions to the highest weightage topics. Ensure every question matches one of the topic IDs.
+Generate the complete diagnostic quiz now. Allocate more questions to the highest weightage topics. Ensure every question matches one of the topic IDs. Make sure this quiz is unique and tests different angles.
 `;
 
     const chatCompletion = await createGroqChatCompletion({
@@ -99,7 +101,7 @@ Generate the complete diagnostic quiz now. Allocate more questions to the highes
         { role: "user", content: userPrompt },
       ],
       response_format: { type: "json_object" },
-      temperature: 0.1,
+      temperature: 0.6,
       max_tokens: 3500,
     });
 
