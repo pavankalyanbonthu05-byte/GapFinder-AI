@@ -111,6 +111,38 @@ export default function DashboardPage() {
     // Load isolated report & attempts for this user
     const reportKey = getUserStorageKey(activeUser, "gapfinder_report");
     const attemptsKey = getUserStorageKey(activeUser, "gapfinder_attempts");
+    const topicsKey = getUserStorageKey(activeUser, "gapfinder_topics");
+    const chunksKey = getUserStorageKey(activeUser, "gapfinder_chunks");
+    const questionsKey = getUserStorageKey(activeUser, "gapfinder_questions");
+
+    // Restore uploaded topics & chunks if user had previously uploaded notes
+    const cachedTopics = localStorage.getItem(topicsKey);
+    const cachedChunks = localStorage.getItem(chunksKey);
+    const cachedQuestions = localStorage.getItem(questionsKey);
+
+    if (cachedTopics && cachedChunks) {
+      try {
+        const parsedTopics = JSON.parse(cachedTopics);
+        const parsedChunks = JSON.parse(cachedChunks);
+        if (parsedTopics.length > 0 && parsedChunks.length > 0) {
+          setTopics(parsedTopics);
+          setChunks(parsedChunks);
+        }
+      } catch (e) {
+        // fallback to default
+      }
+    }
+
+    if (cachedQuestions) {
+      try {
+        const parsedQuestions = JSON.parse(cachedQuestions);
+        if (parsedQuestions.length > 0) {
+          setQuestions(parsedQuestions);
+        }
+      } catch (e) {
+        // fallback to default
+      }
+    }
 
     const cachedReport = localStorage.getItem(reportKey);
     if (cachedReport) {
@@ -146,7 +178,13 @@ export default function DashboardPage() {
     setReport(null);
     if (user) {
       const reportKey = getUserStorageKey(user, "gapfinder_report");
+      const topicsKey = getUserStorageKey(user, "gapfinder_topics");
+      const chunksKey = getUserStorageKey(user, "gapfinder_chunks");
+      const questionsKey = getUserStorageKey(user, "gapfinder_questions");
       localStorage.removeItem(reportKey);
+      localStorage.removeItem(topicsKey);
+      localStorage.removeItem(chunksKey);
+      localStorage.removeItem(questionsKey);
     }
     setActiveTab("topic-map");
   };
@@ -174,6 +212,10 @@ export default function DashboardPage() {
       const data = await res.json();
       if (data.questions && data.questions.length > 0) {
         setQuestions(data.questions);
+        if (user) {
+          const questionsKey = getUserStorageKey(user, "gapfinder_questions");
+          localStorage.setItem(questionsKey, JSON.stringify(data.questions));
+        }
       }
     } catch (err) {
       console.error("Failed to generate quiz for new material:", err);
@@ -189,7 +231,13 @@ export default function DashboardPage() {
     setReport(null);
     if (user) {
       const reportKey = getUserStorageKey(user, "gapfinder_report");
+      const topicsKey = getUserStorageKey(user, "gapfinder_topics");
+      const chunksKey = getUserStorageKey(user, "gapfinder_chunks");
+      const questionsKey = getUserStorageKey(user, "gapfinder_questions");
       localStorage.removeItem(reportKey);
+      localStorage.removeItem(questionsKey);
+      localStorage.setItem(topicsKey, JSON.stringify(newTopics));
+      localStorage.setItem(chunksKey, JSON.stringify(newChunks));
     }
     setActiveTab("topic-map");
 
